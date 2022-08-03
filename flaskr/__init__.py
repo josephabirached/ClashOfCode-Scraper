@@ -1,5 +1,7 @@
 import os
-from flask import Flask
+from flask import Flask, request
+from flaskr.dto.gamestats import GameStats
+from flaskr.playerservice import PlayerService
 from . import db
 
 def create_app(test_config=None):
@@ -29,5 +31,23 @@ def create_app(test_config=None):
     @app.route('/hello')
     def hello():
         return 'Hello, World!'
+
+    @app.route('/player', methods=['GET'])
+    def getPlayerStatistics():
+        args = request.args
+        playerName = args.get('playerName')
+        playerId = args.get('playerId')
+
+        if(playerName != None):
+            playerGames = db.getPlayerGamesByName(playerName)
+        elif(playerId != None):
+            playerGames = db.getPlayerGamesById(playerId)
+        else:
+            return "You must specify the playerName or playerId", 400
+
+        if playerGames == None or len(playerGames) == 0:
+            return "Not found", 404
+
+        return PlayerService().get_player_statistics([GameStats(game[0],game[1],game[2],game[3],game[4],game[5],game[6]) for game in playerGames])
 
     return app

@@ -16,7 +16,6 @@ def get_db():
 
     return g.db
 
-
 def close_db(e=None):
     db = g.pop('db', None)
 
@@ -37,18 +36,18 @@ def init_db():
     for index, row in dataProfiles.iterrows():
         db.execute(
             """INSERT INTO player(username, userId) VALUES(?,?);""",
-            (row['name'],row['profileLink-href'])
+            (row['name'],row['profileLink-href'].split('/')[-1])
             )
 
     db.commit()
 
     # Inserting the Games data
     for index, row in data.iterrows():
-        profileId =  db.execute("""SELECT id FROM player WHERE userId=?;""", (row['profileLink-href'],)).fetchone()[0]
+        profileId =  db.execute("""SELECT id FROM player WHERE userId=?;""", (row['profileLink-href'].split('/')[-1],)).fetchone()[0]
 
         db.execute(
             """INSERT INTO gameScore(gameUrl, ranking, score, gameTime, programmingLang, codeLength, playerId) VALUES(?,?,?,?,?,?,?);""",
-            (row['game-url'],row['rank'],row['score'],row['time'],row['language'],row['length'],profileId)
+            (row['web-scraper-start-url'].split('/')[-1],row['profileLink'], int(row['score'][:-1]) ,row['time'],row['language'],row['length'],profileId)
             )
 
     db.commit()
@@ -64,3 +63,25 @@ def init_db_command():
 def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
+
+def getPlayerGamesByName(playerName):
+    conn = get_db()
+    playerGames = conn.execute("""
+        SELECT username,userid,ranking, score, gameTime, programmingLang, codeLength
+        FROM player p, gameScore g
+        WHERE p.username == ? COLLATE NOCASE
+        AND p.id == g.playerId
+    """, (playerName,)).fetchall()
+
+    return playerGames
+
+def getPlayerGamesById(playerId):
+    conn = get_db()
+    playerGames = conn.execute("""
+        SELECT username,userid,ranking, score, gameTime, programmingLang, codeLength
+        FROM player p, gameScore g
+        WHERE p.userId == ? COLLATE NOCASE
+        AND p.id == g.playerId
+    """, (playerId,)).fetchall()
+
+    return playerGames
