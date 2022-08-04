@@ -85,3 +85,11 @@ def getPlayerGamesById(playerId):
     """, (playerId,)).fetchall()
 
     return playerGames
+
+def getAll():
+    conn = get_db()
+    players = conn.execute("""
+        SELECT DISTINCT userId
+        FROM player
+    """).fetchall()
+    return players

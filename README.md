@@ -14,7 +14,7 @@ Do the following steps to get the data from the games:
 2. Create and import a new Sitemap
 3. Copy the scraping code the from the Sitemap [file](/scraper/games-site-map.txt).
 4. Add the game urls you want to scrap in the Sitemap metadata. (Sitemap clashOfCode -> Edit metadata -> Start URL)
-5. Execute the web scraping. (Sitemap clashOfCode -> Scrape)
+5. Execute the web scraping. (Sitemap clashOfCode -> Scrape) N.B. : Set the request interval to 5000 ms.
 6. Refresh the data and export as CSV. 
 7. Import the CSV file to the [database folder](/scraper) of the project and rename it to "data.csv".
 

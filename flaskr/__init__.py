@@ -3,6 +3,7 @@ from flask import Flask, request
 from flaskr.dto.gamestats import GameStats
 from flaskr.playerservice import PlayerService
 from . import db
+import json
 
 def create_app(test_config=None):
     # create and configure the app
@@ -49,5 +50,16 @@ def create_app(test_config=None):
             return "Not found", 404
 
         return PlayerService().get_player_statistics([GameStats(game[0],game[1],game[2],game[3],game[4],game[5],game[6]) for game in playerGames])
+
+    @app.route('/players', methods=['GET'])
+    def getAllPlayers():
+        profileUrls = ["https://www.codingame.com/profile/"+row[0] for row in db.getAll()] 
+        
+        with open('./scraper/university-site-map.json') as file:
+            data = json.load(file)
+            data["startUrl"] = profileUrls
+            return data
+
+        return 0
 
     return app
