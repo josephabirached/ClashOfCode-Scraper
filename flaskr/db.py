@@ -67,7 +67,7 @@ def init_app(app):
 def getPlayerGamesByName(playerName):
     conn = get_db()
     playerGames = conn.execute("""
-        SELECT username,userid,ranking, score, gameTime, programmingLang, codeLength
+        SELECT username,userid,university,ranking, score, gameTime, programmingLang, codeLength
         FROM player p, gameScore g
         WHERE p.username == ? COLLATE NOCASE
         AND p.id == g.playerId
@@ -78,7 +78,7 @@ def getPlayerGamesByName(playerName):
 def getPlayerGamesById(playerId):
     conn = get_db()
     playerGames = conn.execute("""
-        SELECT username,userid,ranking, score, gameTime, programmingLang, codeLength
+        SELECT username,userid,university,ranking, score, gameTime, programmingLang, codeLength
         FROM player p, gameScore g
         WHERE p.userId == ? COLLATE NOCASE
         AND p.id == g.playerId
@@ -93,3 +93,12 @@ def getAll():
         FROM player
     """).fetchall()
     return players
+
+def updatePlayer(universityName, playerId):
+    conn = get_db()
+    conn.execute("""
+        UPDATE player
+        SET university = ?
+        WHERE userid = ?
+    """, (universityName, playerId))
+    conn.commit()

@@ -3,6 +3,8 @@ from datetime import datetime as dt
 from .dto.gamestats import GameStats
 from .dto.playerstats import PlayerStats
 from flask import jsonify 
+import pandas as pd
+from . import db
 
 class PlayerService:
     def __init__(self) -> None:
@@ -36,9 +38,17 @@ class PlayerService:
         return jsonify(
             PlayerStats(playerName,
             playerId,
+            game.university,
             gamesPlayed,
             averageRank,
             averageScore,averageCode,
             str(datetime.timedelta(seconds=(totalSeconds/gamesPlayed))).split('.')[0],
             languages))
         
+    def update_player_university(self, file):
+        data = pd.read_csv(file)
+
+        data = data[data['university'].notna()]
+
+        for index, row in data.iterrows():
+            db.updatePlayer(row['university'], row['web-scraper-start-url'].split('/')[-1])

@@ -4,6 +4,7 @@ from flaskr.dto.gamestats import GameStats
 from flaskr.playerservice import PlayerService
 from . import db
 import json
+import pandas as pd
 
 def create_app(test_config=None):
     # create and configure the app
@@ -49,17 +50,32 @@ def create_app(test_config=None):
         if playerGames == None or len(playerGames) == 0:
             return "Not found", 404
 
-        return PlayerService().get_player_statistics([GameStats(game[0],game[1],game[2],game[3],game[4],game[5],game[6]) for game in playerGames])
+        return PlayerService().get_player_statistics([GameStats(game[0],game[1],game[2],game[3],game[4],game[5],game[6],game[7]) for game in playerGames])
 
-    @app.route('/players', methods=['GET'])
+    @app.route('/players', methods=['GET', 'POST'])
     def getAllPlayers():
-        profileUrls = ["https://www.codingame.com/profile/"+row[0] for row in db.getAll()] 
-        
-        with open('./scraper/university-site-map.json') as file:
-            data = json.load(file)
-            data["startUrl"] = profileUrls
-            return data
+        if request.method == 'GET':
+            profileUrls = ["https://www.codingame.com/profile/"+row[0] for row in db.getAll()] 
+            
+            with open('./scraper/university-site-map.json') as file:
+                data = json.load(file)
+                data["startUrl"] = profileUrls
+                return data
 
-        return 0
+        if request.method == 'POST':
+            if 'file' not in request.files:
+                return 'No selected file', 400
+            
+            file = request.files['file']
+
+            if file.filename == '':
+                return 'No selected file', 400
+
+            if file.content_type != 'text/csv':
+                return 'Only CSV files allowed', 400
+            
+            PlayerService().update_player_university(file)
+
+            return '', 201
 
     return app

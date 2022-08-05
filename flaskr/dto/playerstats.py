@@ -6,6 +6,7 @@ from typing import Optional
 class PlayerStats:
     name: str
     codingGameId: str
+    university: Optional[str]
     gamesPlayed: int
     averageRank: int
     averageScore: int

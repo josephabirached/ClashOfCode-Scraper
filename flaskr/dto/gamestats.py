@@ -6,6 +6,7 @@ from typing import Optional
 class GameStats:
     username: str
     userId: str
+    university: Optional[str]
     ranking: str
     score: int
     gameTime: time
