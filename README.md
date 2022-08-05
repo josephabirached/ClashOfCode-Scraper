@@ -35,3 +35,16 @@ Execute the following Powershell script
 ```
 .\run.ps1
 ``` 
+
+## Adding the university to the player table
+
+In order to be able to know what university each player is in, execute the following steps:
+
+1. Launch the API
+2. Send a GET request to the ` /players ` end-point
+3. Copy the json result and import it to the scrapper as a sitemap
+4. Scrap the website
+5. Export the data as CSV
+6. Send a POST request to the ` /players ` end-point and specify in the body the CSV file in the form-data
+
+This will add the university name in the players table if the scraper was able to retrieve that. 
